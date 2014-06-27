@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import getopt
 import gzip
 import io
 import itertools
@@ -11,8 +12,8 @@ URL = "http://www1.ncdc.noaa.gov/pub/data/igra/monthly-por/temp_00z.mly.gz"
 
 MISSING = 9999.0
 
-def surface(inp, dat):
-    for station, block in itertools.groupby(surface_years(inp),
+def single_level(inp, dat, level=9999):
+    for station, block in itertools.groupby(single_level_years(inp, level),
       lambda t: t[0]):
         # We have WMO identifiers for all of these stations,
         # but some stations have a radiosonde station and a
@@ -22,16 +23,16 @@ def surface(inp, dat):
         id11 = "IGR{}500".format(station)
         ghcnm_write(id11, (t[1:] for t in block), dat)
 
-def surface_years(inp):
+def single_level_years(inp, selected_level):
     """
-    Process the surface elements of the input, and yield a
+    Process the elements of the input for a single level, and yield a
     series of (wmo, year, data) triples.
     """
 
     def rows():
         for row in inp:
             row = row.split()
-            if row[3] == '1000':
+            if int(row[3]) == selected_level:
                 yield row
 
     # Split into groups of a single year for a single station.
@@ -72,6 +73,12 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
+    opt, arg = getopt.getopt(argv[1:], '', 'level=')
+    d = dict(level=9999)
+    for k,v in opt:
+       if k == '--level':
+           d['level'] = int(v)
+
     if 0:
         f = urllib.request.urlopen(URL)
         uncompressed = gzip.GzipFile(fileobj=f)
@@ -81,10 +88,10 @@ def main(argv=None):
             if i >= 4:
                 sys.exit()
 
-    filename, = argv[1:]
+    filename, = arg
     with open(filename) as inp:
-        with open("igra.dat", "w") as dat:
-            surface(inp, dat)
+        with open("igra-level{}.dat".format(d['level']), "w") as dat:
+            single_level(inp, dat, **d)
 
 if __name__ == '__main__':
     main()
