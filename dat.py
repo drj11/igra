@@ -4,6 +4,7 @@ import getopt
 import gzip
 import io
 import itertools
+import os
 import sys
 import urllib.request
 
@@ -89,8 +90,9 @@ def main(argv=None):
                 sys.exit()
 
     filename, = arg
-    with open(filename) as inp:
-        with open("igra-level{}.dat".format(d['level']), "w") as dat:
+    output_dat = os.path.join("output",
+      "igra-level{}.dat".format(d['level']))
+    with open(filename) as inp, open(output_dat, "w") as dat:
             single_level(inp, dat, **d)
 
 if __name__ == '__main__':
