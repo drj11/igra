@@ -69,14 +69,19 @@ def ghcnm_write(id, values, out):
         formatted_row = FORMAT.format(*((id, year) + data))
         out.write(formatted_row)
 
+def usage(out):
+    out.write("dat.py [--help] [--level PPPP] file.mly\n")
 
 def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    opt, arg = getopt.getopt(argv[1:], '', 'level=')
+    opt, arg = getopt.getopt(argv[1:], '', ['help', 'level='])
     d = dict(level=9999)
     for k,v in opt:
+        if k == '--help':
+            usage(sys.stdout)
+            return 0
         if k == '--level':
             d['level'] = int(v)
 
