@@ -23,5 +23,9 @@ level (identified with 9999 in the data files).  The curious can
 extract data for any level:
 
 ```
-dat.py --level 1000 temp_00z.mly
+dat.py --level 1000
 ```
+
+If you have downloaded a `.mly` file you can also pass that as
+an argument to `dat.py` and it will read that rather than
+downloading from an HTTP server.
