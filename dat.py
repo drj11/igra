@@ -77,8 +77,8 @@ def main(argv=None):
     opt, arg = getopt.getopt(argv[1:], '', 'level=')
     d = dict(level=9999)
     for k,v in opt:
-       if k == '--level':
-           d['level'] = int(v)
+        if k == '--level':
+            d['level'] = int(v)
 
     if 0:
         f = urllib.request.urlopen(URL)
