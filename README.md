@@ -6,8 +6,16 @@ http://www.ncdc.noaa.gov/oa/climate/igra/
 
 ## Run the code
 
+Generate a `.dat` file in `output/` directory:
+
 ```
-dat.py temp_00z.mly
+dat.py
+```
+
+Generate the corresponding `.inv` file:
+
+```
+inv.py
 ```
 
 The default command (above) extracts records for the nominal *surface*
