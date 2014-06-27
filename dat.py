@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# https://docs.python.org/2/whatsnew/2.5.html#the-contextlib-module
+import contextlib
 import getopt
 import gzip
 import io
@@ -70,7 +72,18 @@ def ghcnm_write(id, values, out):
         out.write(formatted_row)
 
 def usage(out):
-    out.write("dat.py [--help] [--level PPPP] file.mly\n")
+    out.write("dat.py [--help] [--level PPPP] [file.mly]\n")
+
+@contextlib.contextmanager
+def from_url(url):
+    def rows():
+        for i, row in enumerate(uncompressed):
+            row = row.decode('ascii')
+            yield row
+
+    f = urllib.request.urlopen(URL)
+    uncompressed = gzip.GzipFile(fileobj=f)
+    yield rows()
 
 def main(argv=None):
     if argv is None:
@@ -85,19 +98,15 @@ def main(argv=None):
         if k == '--level':
             d['level'] = int(v)
 
-    if 0:
-        f = urllib.request.urlopen(URL)
-        uncompressed = gzip.GzipFile(fileobj=f)
-        for i, row in enumerate(uncompressed):
-            row = row.decode('ascii')
-            sys.stdout.write(row)
-            if i >= 4:
-                sys.exit()
+    if len(arg) == 0:
+        inp_context = from_url(URL)
+    else:
+        filename, = arg
+        inp_context = open(filename)
 
-    filename, = arg
     output_dat = os.path.join("output",
       "igra-level{}.dat".format(d['level']))
-    with open(filename) as inp, open(output_dat, "w") as dat:
+    with inp_context as inp, open(output_dat, "w") as dat:
             single_level(inp, dat, **d)
 
 if __name__ == '__main__':
